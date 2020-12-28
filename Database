@@ -1,0 +1,135 @@
+using System;
+
+using System.Collections.Generic;
+
+using System.Linq;
+
+using System.Text;
+
+using System.Threading.Tasks;
+
+using System.Data.SqlClient;
+
+namespace TestApp2_SELECT
+
+{
+
+    class Program
+
+    {
+
+        static void Main(string[] args)
+
+        {
+
+            //set the connection string
+
+            string connString = @"Server =.\SQL2K17; Database = SampleDB; Trusted_Connection = True;";
+
+            //variables to store the query results
+
+            int empID;
+
+            string empCode, empFirstName, empLastName, locationCode, locationDescr;
+
+            try
+
+            {
+
+                //sql connection object
+
+                using (SqlConnection conn = new SqlConnection(connString))
+
+                {
+
+                    //retrieve the SQL Server instance version
+
+                    string query = @"SELECT e.id,e.code,e.firstName,e.lastName,l.code,l.descr
+
+                                     FROM employees e
+
+                                     INNER JOIN location l on e.locationID=l.id;
+
+                                     ";
+
+                    //define the SqlCommand object
+
+                    SqlCommand cmd = new SqlCommand(query, conn);
+
+                    //open connection
+
+                    conn.Open();
+
+                    //execute the SQLCommand
+
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    Console.WriteLine(Environment.NewLine + "Retrieving data from database..." + Environment.NewLine);
+
+                    Console.WriteLine("Retrieved records:");
+
+                    //check if there are records
+
+                    if (dr.HasRows)
+
+                    {
+
+                        while (dr.Read())
+
+                        {
+
+                            empID = dr.GetInt32(0);
+
+                            empCode = dr.GetString(1);
+
+                            empFirstName = dr.GetString(2);
+
+                            empLastName = dr.GetString(3);
+
+                            locationCode = dr.GetString(4);
+
+                            locationDescr = dr.GetString(5);
+
+                            //display retrieved record
+
+                            Console.WriteLine("{0},{1},{2},{3},{4},{5}", empID.ToString(), empCode, empFirstName, empLastName, locationCode, locationDescr);
+
+                        }
+
+                    }
+
+                    else
+
+                    {
+
+                        Console.WriteLine("No data found.");
+
+                    }
+
+                    //close data reader
+
+                    dr.Close();
+
+                    //close connection
+
+                    conn.Close();
+
+                }
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                //display error message
+
+                Console.WriteLine("Exception: " + ex.Message);
+
+            }
+
+        }
+
+    }
+
+} 
